@@ -37,6 +37,10 @@
 
 Unlike traditional chatbots that simply respond, Solasta **autonomously decomposes** a natural language study goal (e.g., *"Plan my GATE exam schedule for 3 months"*) into a multi-step execution plan, **executes each step using specialized tools**, **evaluates results**, and **replans on failure** — all streamed in real-time to a premium dark-themed dashboard.
 
+### 🚀 Live Demos
+- **Frontend (Vercel):** [https://solasta-smart-scheduler.vercel.app](https://solasta-smart-scheduler.vercel.app)
+- **Backend (Render):** [https://solasta-smart-scheduler.onrender.com/health](https://solasta-smart-scheduler.onrender.com/health)
+
 ---
 
 ## 🏗️ Architecture
