@@ -103,7 +103,7 @@ Solasta implements a **4-Agent Cognitive Architecture** inspired by the Plan-Exe
 - Live HTTP requests demonstrate the "Act" requirement of the hackathon
 
 ### 📅 Actionable Output
-- **📄 PDF Export** — Download a beautifully formatted study schedule PDF
+- **📄 Tabular PDF Export** — Download a beautifully formatted, modern tabular study schedule PDF
 - **📅 iCalendar Export** — Generate `.ics` files importable into Google Calendar, Outlook, Apple Calendar
 
 ### 🧠 Transparent Intelligence ("View Brain")

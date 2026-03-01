@@ -252,6 +252,11 @@ async def analyze_syllabus(
     2. Offline Knowledge Base (fallback) → built-in data for popular exams
     3. User-provided subjects (manual override)
     """
+    try:
+        duration_weeks = int(duration_weeks)
+    except (ValueError, TypeError):
+        duration_weeks = 12
+
     exam_display = exam_name or "Custom Study Plan"
 
     # ── STRATEGY 1: User provided explicit subjects ──────────
@@ -443,6 +448,15 @@ def allocate_time_blocks(
     subjects: str = "",
 ) -> Dict[str, Any]:
     """Allocate study time blocks across weeks with Pomodoro structure."""
+    try:
+        total_hours = float(total_hours)
+        weeks = int(weeks)
+        daily_hours = float(daily_hours)
+    except (ValueError, TypeError):
+        total_hours = 100.0
+        weeks = 12
+        daily_hours = 4.0
+
     subject_list = [s.strip() for s in subjects.split(",") if s.strip()]
     if not subject_list:
         subject_list = ["General"]
@@ -500,6 +514,13 @@ def create_schedule(
     start_date: str = "",
 ) -> Dict[str, Any]:
     """Generate a detailed weekly study schedule with real subjects."""
+    try:
+        weeks = int(weeks)
+        daily_hours = float(daily_hours)
+    except (ValueError, TypeError):
+        weeks = 12
+        daily_hours = 4.0
+
     subject_list = [s.strip() for s in subjects.split(",") if s.strip()]
 
     # If no subjects were passed, check if we can get them from the cached syllabus
@@ -765,6 +786,10 @@ def fetch_study_resources(
         topic_list = _get_cached_subjects() or ["Mathematics", "Physics", "Computer Science"]
 
     # Limit to avoid excessive API calls
+    try:
+        max_topics = int(max_topics)
+    except (ValueError, TypeError):
+        max_topics = 8
     topic_list = topic_list[:max_topics]
 
     resources: Dict[str, Any] = {}

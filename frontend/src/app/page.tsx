@@ -658,18 +658,72 @@ export default function Home() {
                               });
                               delete scheduleData.schedule;
                             }
-                            const renderData = (obj: any, level = 0): string => {
-                              if (typeof obj === 'string') return `<p style="margin: 0 0 4px 0;">${obj}</p>`;
-                              if (Array.isArray(obj)) return `<ul style="margin: 2px 0 8px 16px; padding: 0;">` + obj.map(item => `<li style="margin-bottom: 2px;">${renderData(item, level + 1)}</li>`).join('') + `</ul>`;
+                            const renderData = (obj: any): string => {
+                              if (typeof obj === 'string') return obj;
+                              if (typeof obj === 'number' || typeof obj === 'boolean') return String(obj);
+
+                              if (Array.isArray(obj)) {
+                                if (obj.length === 0) return 'None';
+
+                                // Detect if array of objects (to make a table) or array of primitives
+                                const isObjArray = typeof obj[0] === 'object' && obj[0] !== null;
+
+                                if (isObjArray) {
+                                  // Extract all unique keys from all objects for table headers
+                                  const allKeys = Array.from(new Set(obj.flatMap(item => Object.keys(item))));
+
+                                  let tableHtml = `<table style="width: 100%; border-collapse: collapse; margin-top: 6px; margin-bottom: 12px; font-size: 11px; font-family: 'Inter', system-ui, sans-serif;">
+                                    <thead>
+                                      <tr style="background: #eef2ff; color: #3730a3; border-bottom: 2px solid #c7d2fe;">`;
+                                  allKeys.forEach(key => {
+                                    const cleanKey = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                                    tableHtml += `<th style="padding: 8px 12px; text-align: left; font-weight: 600;">${cleanKey}</th>`;
+                                  });
+                                  tableHtml += `</tr></thead><tbody>`;
+
+                                  obj.forEach((item, index) => {
+                                    const bg = index % 2 === 0 ? '#ffffff' : '#fafafa';
+                                    tableHtml += `<tr style="background: ${bg}; border-bottom: 1px solid #eee;">`;
+                                    allKeys.forEach(key => {
+                                      tableHtml += `<td style="padding: 8px 12px; color: #555;">${renderData(item[key])}</td>`;
+                                    });
+                                    tableHtml += `</tr>`;
+                                  });
+                                  tableHtml += `</tbody></table>`;
+                                  return tableHtml;
+                                } else {
+                                  return `<ul style="margin: 4px 0 8px 16px; padding: 0;">` + obj.map(item => `<li style="margin-bottom: 4px; color: #555;">${renderData(item)}</li>`).join('') + `</ul>`;
+                                }
+                              }
+
                               if (typeof obj === 'object' && obj !== null) {
-                                return Object.entries(obj).map(([k, v]) => {
+                                let blockHtml = `<div style="margin-bottom: 16px;">`;
+                                Object.entries(obj).forEach(([k, v]) => {
                                   const cleanKey = k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-                                  return `<div style="margin-bottom: ${level === 0 ? '10px' : '4px'}; page-break-inside: avoid;"><strong style="color: #444; font-size: ${level === 0 ? '14px' : '12px'}; display: block; margin-bottom: 2px; border-bottom: ${level === 0 ? '1px solid #eee' : 'none'}; padding-bottom: ${level === 0 ? '2px' : '0'};">${cleanKey}:</strong><div style="padding-left: ${level === 0 ? '0' : '12px'};">${renderData(v, level + 1)}</div></div>`;
-                                }).join('');
+
+                                  // If the value is a complex object/array, render it as a section
+                                  if (typeof v === 'object' && v !== null) {
+                                    blockHtml += `<div style="margin-bottom: 12px; page-break-inside: avoid;">
+                                      <h4 style="margin: 0 0 6px 0; font-size: 13px; color: #111; border-bottom: 1px solid #eee; padding-bottom: 4px;">${cleanKey}</h4>
+                                      <div style="padding-left: 0;">${renderData(v)}</div>
+                                    </div>`;
+                                  } else {
+                                    // Inline simple key-value pairs
+                                    blockHtml += `<div style="display: flex; gap: 8px; margin-bottom: 4px; font-size: 11px;">
+                                      <strong style="color: #444; width: 140px; flex-shrink: 0;">${cleanKey}:</strong>
+                                      <span style="color: #666;">${renderData(v)}</span>
+                                    </div>`;
+                                  }
+                                });
+                                blockHtml += `</div>`;
+                                return blockHtml;
                               }
                               return String(obj);
                             };
-                            contentHtml += renderData(scheduleData);
+                            contentHtml += `<div style="page-break-before: always; padding-top: 20px;">
+                                <h2 style="font-size: 20px; color: #111; margin: 0 0 16px 0; padding-bottom: 8px; border-bottom: 2px solid #ccc;">Additional Output Details</h2>
+                                ${renderData(scheduleData)}
+                            </div>`;
                             contentHtml += `</div>`;
                           } else {
                             contentHtml += `<div style="padding: 20px; background: #f9f9f9; border: 1px dashed #ccc; text-align: center;">Schedule data is being compiled.</div>`;
